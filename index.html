@@ -291,12 +291,12 @@
             </div>
             <div>
               <label class="block text-[10px] text-slate-400 mb-0.5">Month (Amharic)</label>
-              <!-- VISIBLE ETHIOPIAN MONTH DROPDOWN -->
+              <!-- CLEAR & VISIBLE ETHIOPIAN MONTH SELECTOR -->
               <select 
                 id="formEthMonth" 
                 required
                 onchange="autoCalculateWeekDisplayEth()"
-                class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-900 dark:text-white font-medium"
+                class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-900 dark:text-white font-medium"
               >
                 <option value="1" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">1 - መስከረም</option>
                 <option value="2" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">2 - ጥቅምት</option>
@@ -465,7 +465,6 @@
       return `${dd}/${mm}/${ethObj.year} (${ETH_MONTH_NAMES[ethObj.month - 1]})`;
     }
 
-    // Snap Ethiopian date to the Monday of that week
     function getEthMonday(ethYear, ethMonth, ethDay) {
       const gIso = ethiopianToGregorianStr(ethYear, ethMonth, ethDay);
       const [gy, gm, gd] = gIso.split('-').map(Number);
@@ -477,7 +476,6 @@
       return gregorianToEthiopianStr(isoM);
     }
 
-    // Calculate Week Number relative to Program Start (06/11/2018 E.C.)
     function calculateWeekNumberEth(ethYear, ethMonth, ethDay) {
       const startJDN = ethiopianToJDN(PROGRAM_START_ETH.year, PROGRAM_START_ETH.month, PROGRAM_START_ETH.day);
       const targetEth = getEthMonday(ethYear, ethMonth, ethDay);
@@ -641,7 +639,6 @@
     }
 
     function updateStats() {
-      // Current Date in Ethiopian Calendar
       const todayIso = new Date().toISOString().split('T')[0];
       const todayEth = gregorianToEthiopianStr(todayIso);
       const todayMondayEth = getEthMonday(todayEth.year, todayEth.month, todayEth.day);
