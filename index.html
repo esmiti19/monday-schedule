@@ -49,7 +49,7 @@
         <!-- Permanent Program Info Pill -->
         <div class="hidden sm:flex items-center space-x-2 bg-slate-100 dark:bg-slate-700/60 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300">
           <i data-lucide="flag" class="w-3.5 h-3.5 text-brand-500"></i>
-          <span>Program Start: <strong>13/07/2026</strong></span>
+          <span>Program Start: <strong>06 ሐምሌ 2018</strong></span>
         </div>
 
         <!-- Dark Mode Toggle -->
@@ -275,15 +275,24 @@
           <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">
             Presentation Date (Select Monday) *
           </label>
-          <!-- Native Calendar Picker Input -->
-          <input 
-            type="date" 
-            id="formDate" 
-            required
-            onchange="autoCalculateWeekDisplay()"
-            class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"
-          >
-          <p class="text-[11px] text-slate-400 mt-1">If you select another day, it will automatically align to that week's Monday.</p>
+          <!-- Ethiopian calendar is the only date selector; Gregorian date is shown automatically. -->
+          <input type="hidden" id="formDate">
+          <div class="mt-1">
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">
+              የኢትዮጵያ ቀን (Ethiopian Calendar) *
+            </label>
+            <div class="grid grid-cols-3 gap-2">
+              <select id="ethiopianDay" aria-label="ቀን" onchange="updateGregorianFromEthiopian()" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"></select>
+              <select id="ethiopianMonth" aria-label="ወር" onchange="updateGregorianFromEthiopian()" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"></select>
+              <select id="ethiopianYear" aria-label="ዓመት" onchange="updateGregorianFromEthiopian()" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"></select>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">ቀኑን አንድ ጊዜ ብቻ ይምረጡ። The Gregorian date is filled in automatically.</p>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mt-3 mb-1">
+              Gregorian Date (Automatic)
+            </label>
+            <input type="text" id="gregorianDateDisplay" readonly class="w-full px-3 py-2 text-sm bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-400 font-mono">
+            <p class="text-[11px] text-slate-400 mt-1">የሳምንቱ ቀን ሰኞ እንዲሆን በራስ-ሰር ይስተካከላል።</p>
+          </div>
         </div>
 
         <div>
@@ -363,7 +372,8 @@
   <!-- APPLICATION LOGIC -->
   <script>
     // PERMANENT PROGRAM START DATE: 13/07/2026 (YYYY-MM-DD format for local date math)
-    const PROGRAM_START_DATE_STR = "2026-07-13"; 
+    const PROGRAM_START_ETHIOPIAN_DATE = { year: 2018, month: 11, day: 6 }; // 06 ሐምሌ 2018
+    const PROGRAM_START_DATE_STR = jdnToGregorianDate(ethiopianToJdn(PROGRAM_START_ETHIOPIAN_DATE.year, PROGRAM_START_ETHIOPIAN_DATE.month, PROGRAM_START_ETHIOPIAN_DATE.day)); 
     
     // Core Data State
     let presentations = [];
@@ -418,6 +428,87 @@
       return `${day}/${month}/${year}`;
     }
 
+    // --- ETHIOPIAN CALENDAR CONVERSION HELPERS ---
+
+    const ETHIOPIAN_MONTHS = [
+      'መስከረም', 'ጥቅምት', 'ህዳር', 'ታህሳስ', 'ጥር', 'የካቲት',
+      'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜ'
+    ];
+
+    // Ethiopian calendar epoch expressed as a Julian Day Number.
+    function ethiopianToJdn(year, month, day) {
+      return 1724221 + (365 * (year - 1)) + Math.floor(year / 4) +
+        (30 * (month - 1)) + (day - 1);
+    }
+
+    function jdnToGregorianDate(jdn) {
+      const timestamp = (jdn - 2440588) * 86400000;
+      const date = new Date(timestamp);
+      return formatISO(new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+    }
+
+    function gregorianToEthiopian(dateStr) {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const date = new Date(Date.UTC(year, month - 1, day));
+      const jdn = Math.floor(date.getTime() / 86400000) + 2440588;
+      let ethiopianYear = year - 7;
+
+      while (jdn < ethiopianToJdn(ethiopianYear, 1, 1)) ethiopianYear--;
+      while (jdn >= ethiopianToJdn(ethiopianYear + 1, 1, 1)) ethiopianYear++;
+
+      const dayOfYear = jdn - ethiopianToJdn(ethiopianYear, 1, 1);
+      const ethiopianMonth = Math.floor(dayOfYear / 30) + 1;
+      const ethiopianDay = (dayOfYear % 30) + 1;
+
+      return { year: ethiopianYear, month: ethiopianMonth, day: ethiopianDay };
+    }
+
+    function populateEthiopianDateFields(dateStr) {
+      if (!dateStr) return;
+      const ethiopianDate = gregorianToEthiopian(dateStr);
+      const daySelect = document.getElementById('ethiopianDay');
+      const monthSelect = document.getElementById('ethiopianMonth');
+      const yearSelect = document.getElementById('ethiopianYear');
+
+      if (!daySelect || !monthSelect || !yearSelect) return;
+
+      daySelect.innerHTML = '';
+      for (let day = 1; day <= (ethiopianDate.month === 13 ? 6 : 30); day++) {
+        daySelect.add(new Option(day, day));
+      }
+
+      monthSelect.innerHTML = '';
+      ETHIOPIAN_MONTHS.forEach((month, index) => {
+        monthSelect.add(new Option(month, index + 1));
+      });
+
+      yearSelect.innerHTML = '';
+      for (let year = ethiopianDate.year - 2; year <= ethiopianDate.year + 2; year++) {
+        yearSelect.add(new Option(year, year));
+      }
+
+      daySelect.value = ethiopianDate.day;
+      monthSelect.value = ethiopianDate.month;
+      yearSelect.value = ethiopianDate.year;
+    }
+
+    function updateGregorianFromEthiopian() {
+      const day = Number(document.getElementById('ethiopianDay').value);
+      const month = Number(document.getElementById('ethiopianMonth').value);
+      const year = Number(document.getElementById('ethiopianYear').value);
+      if (!day || !month || !year) return;
+
+      const maxDay = month === 13 ? (year % 4 === 3 ? 6 : 5) : 30;
+      if (day > maxDay) {
+        document.getElementById('ethiopianDay').value = maxDay;
+      }
+
+      const selectedDay = Math.min(day, maxDay);
+      const gregorianDate = jdnToGregorianDate(ethiopianToJdn(year, month, selectedDay));
+      document.getElementById('formDate').value = gregorianDate;
+      autoCalculateWeekDisplay();
+    }
+
     // Snap any selected date to the Monday of that week
     function getMondayOfWeek(dateStr) {
       const date = parseLocalDate(dateStr);
@@ -451,6 +542,8 @@
 
       const weekNum = calculateWeekNumber(mondayStr);
       document.getElementById('formWeekDisplay').value = `Week ${weekNum}`;
+      document.getElementById('gregorianDateDisplay').value = mondayStr;
+      populateEthiopianDateFields(mondayStr);
     }
 
     // --- RENDER FUNCTIONS ---
