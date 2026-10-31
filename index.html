@@ -160,7 +160,7 @@
           <!-- Empty State -->
           <div id="emptyState" class="hidden py-12 text-center text-slate-400 dark:text-slate-500">
             <i data-lucide="calendar-x" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-            <p class="text-sm font-medium">No presentations found matching your filter.</p>
+            <p class="text-sm font-medium">No presentations scheduled yet. Click 'Schedule Monday Session' to add one.</p>
           </div>
         </div>
 
@@ -379,31 +379,9 @@
         } catch (e) {
           presentations = [];
         }
-      }
-
-      // Seed initial sample data if empty
-      if (!presentations || presentations.length === 0) {
-        presentations = [
-          {
-            id: '1',
-            presenter: 'Esmelealem Berhanu',
-            date: '2026-07-13',
-            topic: 'Kickoff: Software Engineering Workflows & Automation',
-            status: 'Completed',
-            fileName: null,
-            fileData: null
-          },
-          {
-            id: '2',
-            presenter: 'Abebe Bikila',
-            date: '2026-07-20',
-            topic: 'Modern Mobile Development Practices',
-            status: 'Scheduled',
-            fileName: null,
-            fileData: null
-          }
-        ];
-        saveData();
+      } else {
+        // Start completely empty if nothing is in storage
+        presentations = [];
       }
 
       renderScheduleTable();
@@ -549,7 +527,18 @@
       // Auto-select first item for preview if none selected
       if (!selectedSessionId && filtered.length > 0) {
         selectSessionForPreview(filtered[0].id);
+      } else if (filtered.length === 0) {
+        resetPreviewPane();
       }
+    }
+
+    function resetPreviewPane() {
+      selectedSessionId = null;
+      document.getElementById('previewWeek').textContent = 'Week # --';
+      document.getElementById('previewDate').textContent = 'DD/MM/YYYY';
+      document.getElementById('previewTopic').textContent = 'Select a presentation to view formatted title details';
+      document.getElementById('previewPresenter').textContent = '--';
+      document.getElementById('attachedFileContainer').classList.add('hidden');
     }
 
     function selectSessionForPreview(id) {
@@ -589,7 +578,6 @@
       document.getElementById('statTotalSessions').textContent = presentations.length;
 
       // CHRONOLOGICAL NEXT PRESENTER LOGIC:
-      // Filter for sessions whose Monday date is >= today's Monday date AND status is 'Scheduled'
       const upcomingSessions = presentations
         .filter(p => p.status === 'Scheduled' && getMondayOfWeek(p.date) >= todayMondayStr)
         .sort((a, b) => a.date.localeCompare(b.date));
@@ -599,7 +587,6 @@
         document.getElementById('statNextDate').textContent = formatDisplayDate(getMondayOfWeek(next.date));
         document.getElementById('statNextPresenter').textContent = next.presenter;
       } else {
-        // Fallback: Check if there's any session strictly in the future regardless of status
         const futureSessions = presentations
           .filter(p => getMondayOfWeek(p.date) >= todayMondayStr)
           .sort((a, b) => a.date.localeCompare(b.date));
@@ -639,7 +626,6 @@
       document.getElementById('sessionId').value = '';
       document.getElementById('formPresenter').value = '';
       
-      // Default to next Monday
       const defaultMonday = getMondayOfWeek(formatISO(new Date()));
       document.getElementById('formDate').value = defaultMonday;
       document.getElementById('formTopic').value = '';
@@ -694,7 +680,6 @@
 
       const processSave = (fileName, fileData) => {
         if (id) {
-          // Edit existing
           const index = presentations.findIndex(p => p.id === id);
           if (index !== -1) {
             presentations[index] = { 
@@ -708,7 +693,6 @@
             };
           }
         } else {
-          // Create new
           const newSession = {
             id: Date.now().toString(),
             presenter,
@@ -729,7 +713,6 @@
         closeModal();
       };
 
-      // Handle File Upload to Base64 Data URL
       if (fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
         const reader = new FileReader();
