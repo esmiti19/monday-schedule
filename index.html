@@ -46,10 +46,10 @@
       </div>
       
       <div class="flex items-center space-x-3">
-        <!-- Permanent Program Info Pill (Ethiopian Calendar) -->
+        <!-- Permanent Program Info Pill -->
         <div class="hidden sm:flex items-center space-x-2 bg-slate-100 dark:bg-slate-700/60 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300">
           <i data-lucide="flag" class="w-3.5 h-3.5 text-brand-500"></i>
-          <span>Program Start: <strong>06/11/2018 (E.C.)</strong></span>
+          <span>Program Start: <strong>13/07/2026</strong></span>
         </div>
 
         <!-- Dark Mode Toggle -->
@@ -143,7 +143,7 @@
               <thead>
                 <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   <th class="py-3 px-4">Week</th>
-                  <th class="py-3 px-4">Monday Date (E.C.)</th>
+                  <th class="py-3 px-4">Monday Date</th>
                   <th class="py-3 px-4">Presenter</th>
                   <th class="py-3 px-4">Topic / Title</th>
                   <th class="py-3 px-4 text-center">Attachment</th>
@@ -175,7 +175,7 @@
               <i data-lucide="file-text" class="w-4 h-4 text-brand-500"></i>
               <span>PowerPoint Cover Text</span>
             </h2>
-            <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded font-mono">Ethiopian Cal.</span>
+            <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded font-mono">Live Format</span>
           </div>
 
           <p class="text-xs text-slate-500 dark:text-slate-400">
@@ -189,7 +189,7 @@
             <div>
               <div class="flex items-center justify-between text-xs text-brand-400 font-mono tracking-wider font-semibold uppercase mb-2">
                 <span id="previewWeek">Week # --</span>
-                <span id="previewDate">DD/MM/YYYY E.C.</span>
+                <span id="previewDate">DD/MM/YYYY</span>
               </div>
               <h3 id="previewTopic" class="text-lg font-bold text-white leading-snug line-clamp-3">
                 Select a presentation to view formatted title details
@@ -273,60 +273,17 @@
 
         <div>
           <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">
-            Presentation Date (Ethiopian Calendar: DD/MM/YYYY) *
+            Presentation Date (Select Monday) *
           </label>
-          <!-- Ethiopian Date Inputs (Day, Month, Year) -->
-          <div class="grid grid-cols-3 gap-2">
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Day (1-30)</label>
-              <input 
-                type="number" 
-                id="formEthDay" 
-                min="1" 
-                max="30" 
-                required
-                onchange="autoCalculateWeekDisplayEth()"
-                class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-900 dark:text-white font-mono"
-              >
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Month (Amharic)</label>
-              <!-- CLEAR & VISIBLE ETHIOPIAN MONTH SELECTOR -->
-              <select 
-                id="formEthMonth" 
-                required
-                onchange="autoCalculateWeekDisplayEth()"
-                class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-900 dark:text-white font-medium"
-              >
-                <option value="1" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">1 - መስከረም</option>
-                <option value="2" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">2 - ጥቅምት</option>
-                <option value="3" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">3 - ኅዳር</option>
-                <option value="4" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">4 - ታኅሣሥ</option>
-                <option value="5" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">5 - ጥር</option>
-                <option value="6" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">6 - የካቲት</option>
-                <option value="7" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">7 - መጋቢት</option>
-                <option value="8" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">8 - ሚያዝያ</option>
-                <option value="9" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">9 - ግንቦት</option>
-                <option value="10" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">10 - ሰኔ</option>
-                <option value="11" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">11 - ሐምሌ</option>
-                <option value="12" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">12 - ነሐሴ</option>
-                <option value="13" class="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">13 - ጳጉሜ</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400 mb-0.5">Year (E.C.)</label>
-              <input 
-                type="number" 
-                id="formEthYear" 
-                min="2015" 
-                max="2035" 
-                required
-                onchange="autoCalculateWeekDisplayEth()"
-                class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-900 dark:text-white font-mono"
-              >
-            </div>
-          </div>
-          <p class="text-[11px] text-slate-400 mt-1">SESSIONS ARE SCHEDULED ON MONDAYS. Date selection auto-aligns to the Monday of that Ethiopian week.</p>
+          <!-- Native Calendar Picker Input -->
+          <input 
+            type="date" 
+            id="formDate" 
+            required
+            onchange="autoCalculateWeekDisplay()"
+            class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"
+          >
+          <p class="text-[11px] text-slate-400 mt-1">If you select another day, it will automatically align to that week's Monday.</p>
         </div>
 
         <div>
@@ -338,7 +295,7 @@
             id="formWeekDisplay" 
             readonly 
             disabled 
-            placeholder="Auto-calculated from Ethiopian date..."
+            placeholder="Auto-calculated from date..."
             class="w-full px-3 py-2 text-sm bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-400 font-mono font-medium"
           >
         </div>
@@ -403,94 +360,17 @@
     </div>
   </div>
 
-  <!-- ETHIOPIAN CALENDAR & APPLICATION LOGIC -->
+  <!-- APPLICATION LOGIC -->
   <script>
-    // PERMANENT PROGRAM START DATE IN ETHIOPIAN CALENDAR: 06/11/2018 (Hamle 6, 2018 E.C.)
-    const PROGRAM_START_ETH = { day: 6, month: 11, year: 2018 };
-    const ETH_MONTH_NAMES = ["መስከረም", "ጥቅምት", "ኅዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"];
-
-    // --- ETHIOPIAN & GREGORIAN CONVERSION ALGORITHMS ---
-    function gregorianToJDN(year, month, day) {
-      let a = Math.floor((14 - month) / 12);
-      let y = year + 4800 - a;
-      let m = month + 12 * a - 3;
-      return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
-    }
-
-    function jdnToGregorian(jdn) {
-      let f = jdn + 1401 + Math.floor((Math.floor((jdn + 1842797) / 146097) * 3) / 4) - 38;
-      let e = 4 * f + 3;
-      let g = Math.floor((e % 1461) / 4);
-      let h = 5 * g + 2;
-      let day = Math.floor((h % 153) / 5) + 1;
-      let month = Math.floor(h / 153) + 1;
-      if (month > 12) { month -= 12; g += 1; }
-      let year = Math.floor(e / 1461) - 4716 + Math.floor((12 - month) / 12);
-      return { year, month, day };
-    }
-
-    function ethiopianToJDN(year, month, day) {
-      return 1723856 + 365 * (year - 1) + Math.floor((year - 1) / 4) + 30 * (month - 1) + day - 1;
-    }
-
-    function jdnToEthiopian(jdn) {
-      let r = (jdn - 1723856) % 1461;
-      let year = 4 * Math.floor((jdn - 1723856) / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
-      let r2 = (jdn - 1723856) - (365 * (year - 1) + Math.floor((year - 1) / 4));
-      let month = Math.floor(r2 / 30) + 1;
-      let day = (r2 % 30) + 1;
-      if (year <= 0) year = 1;
-      return { year, month, day };
-    }
-
-    function gregorianToEthiopianStr(isoDateStr) {
-      if (!isoDateStr) return { year: 2018, month: 11, day: 6 };
-      const [y, m, d] = isoDateStr.split('-').map(Number);
-      const jdn = gregorianToJDN(y, m, d);
-      return jdnToEthiopian(jdn);
-    }
-
-    function ethiopianToGregorianStr(ethYear, ethMonth, ethDay) {
-      const jdn = ethiopianToJDN(Number(ethYear), Number(ethMonth), Number(ethDay));
-      const g = jdnToGregorian(jdn);
-      const mm = String(g.month).padStart(2, '0');
-      const dd = String(g.day).padStart(2, '0');
-      return `${g.year}-${mm}-${dd}`;
-    }
-
-    function formatEthDisplay(ethObj) {
-      if (!ethObj) return '--/--/----';
-      const dd = String(ethObj.day).padStart(2, '0');
-      const mm = String(ethObj.month).padStart(2, '0');
-      return `${dd}/${mm}/${ethObj.year} (${ETH_MONTH_NAMES[ethObj.month - 1]})`;
-    }
-
-    function getEthMonday(ethYear, ethMonth, ethDay) {
-      const gIso = ethiopianToGregorianStr(ethYear, ethMonth, ethDay);
-      const [gy, gm, gd] = gIso.split('-').map(Number);
-      const dateObj = new Date(gy, gm - 1, gd);
-      const day = dateObj.getDay();
-      const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1);
-      const mondayDate = new Date(dateObj.setDate(diff));
-      const isoM = `${mondayDate.getFullYear()}-${String(mondayDate.getMonth() + 1).padStart(2, '0')}-${String(mondayDate.getDate()).padStart(2, '0')}`;
-      return gregorianToEthiopianStr(isoM);
-    }
-
-    function calculateWeekNumberEth(ethYear, ethMonth, ethDay) {
-      const startJDN = ethiopianToJDN(PROGRAM_START_ETH.year, PROGRAM_START_ETH.month, PROGRAM_START_ETH.day);
-      const targetEth = getEthMonday(ethYear, ethMonth, ethDay);
-      const targetJDN = ethiopianToJDN(targetEth.year, targetEth.month, targetEth.day);
-
-      const diffDays = targetJDN - startJDN;
-      const weekNum = Math.floor(diffDays / 7) + 1;
-      return weekNum > 0 ? weekNum : 1;
-    }
-
-    // --- CORE APP STATE ---
+    // PERMANENT PROGRAM START DATE: 13/07/2026 (YYYY-MM-DD format for local date math)
+    const PROGRAM_START_DATE_STR = "2026-07-13"; 
+    
+    // Core Data State
     let presentations = [];
     let selectedSessionId = null;
-    let tempAttachedFileData = null;
+    let tempAttachedFileData = null; // Store base64 temporary data when editing
 
+    // Load initial data from LocalStorage
     function initApp() {
       const saved = localStorage.getItem('monday_presentations_data');
       if (saved) {
@@ -500,6 +380,7 @@
           presentations = [];
         }
       } else {
+        // Start completely empty if nothing is in storage
         presentations = [];
       }
 
@@ -508,30 +389,78 @@
       lucide.createIcons();
     }
 
+    // Save Data to LocalStorage
     function saveData() {
       localStorage.setItem('monday_presentations_data', JSON.stringify(presentations));
     }
 
-    function autoCalculateWeekDisplayEth() {
-      const d = Number(document.getElementById('formEthDay').value);
-      const m = Number(document.getElementById('formEthMonth').value);
-      const y = Number(document.getElementById('formEthYear').value);
-      if (!d || !m || !y) return;
+    // --- DATE & WEEK HELPER FUNCTIONS ---
 
-      const mondayEth = getEthMonday(y, m, d);
-      document.getElementById('formEthDay').value = mondayEth.day;
-      document.getElementById('formEthMonth').value = mondayEth.month;
-      document.getElementById('formEthYear').value = mondayEth.year;
+    // Parse 'YYYY-MM-DD' as local Date object (prevents 1-day UTC shift)
+    function parseLocalDate(dateStr) {
+      if (!dateStr) return new Date();
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
 
-      const weekNum = calculateWeekNumberEth(mondayEth.year, mondayEth.month, mondayEth.day);
+    // Format local Date object to 'YYYY-MM-DD' string
+    function formatISO(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Format Date string 'YYYY-MM-DD' to strict 'DD/MM/YYYY' for UI display
+    function formatDisplayDate(dateStr) {
+      if (!dateStr) return '--/--/----';
+      const [year, month, day] = dateStr.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    // Snap any selected date to the Monday of that week
+    function getMondayOfWeek(dateStr) {
+      const date = parseLocalDate(dateStr);
+      const day = date.getDay();
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Sunday
+      const monday = new Date(date.setDate(diff));
+      return formatISO(monday);
+    }
+
+    // Calculate Week Number relative to permanent start date (13/07/2026)
+    function calculateWeekNumber(targetDateStr) {
+      const mondayTargetStr = getMondayOfWeek(targetDateStr);
+      const start = parseLocalDate(PROGRAM_START_DATE_STR);
+      const target = parseLocalDate(mondayTargetStr);
+      
+      const diffTime = target.getTime() - start.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      const weekNum = Math.floor(diffDays / 7) + 1;
+      
+      return weekNum > 0 ? weekNum : 1;
+    }
+
+    // Triggered on Calendar Picker Change inside Modal
+    function autoCalculateWeekDisplay() {
+      const rawDateVal = document.getElementById('formDate').value;
+      if (!rawDateVal) return;
+      
+      // Auto-snap calendar input to Monday
+      const mondayStr = getMondayOfWeek(rawDateVal);
+      document.getElementById('formDate').value = mondayStr;
+
+      const weekNum = calculateWeekNumber(mondayStr);
       document.getElementById('formWeekDisplay').value = `Week ${weekNum}`;
     }
+
+    // --- RENDER FUNCTIONS ---
 
     function renderScheduleTable() {
       const tbody = document.getElementById('scheduleTableBody');
       const emptyState = document.getElementById('emptyState');
       const searchQuery = (document.getElementById('searchInput').value || '').toLowerCase();
 
+      // Sort by date ascending
       let filtered = [...presentations].sort((a, b) => a.date.localeCompare(b.date));
 
       if (searchQuery) {
@@ -551,10 +480,9 @@
       }
 
       filtered.forEach(p => {
-        const ethDate = gregorianToEthiopianStr(p.date);
-        const mondayEth = getEthMonday(ethDate.year, ethDate.month, ethDate.day);
-        const weekNum = calculateWeekNumberEth(mondayEth.year, mondayEth.month, mondayEth.day);
-        const displayDateEth = formatEthDisplay(mondayEth);
+        const mondayStr = getMondayOfWeek(p.date);
+        const weekNum = calculateWeekNumber(mondayStr);
+        const displayDate = formatDisplayDate(mondayStr);
         const isSelected = p.id === selectedSessionId;
 
         const tr = document.createElement('tr');
@@ -565,13 +493,14 @@
         if (p.status === 'Completed') statusBadgeClass = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300';
         if (p.status === 'Postponed') statusBadgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
 
+        // File download column button
         const fileBtnHtml = p.fileData 
           ? `<button onclick="downloadSpecificFile('${p.id}')" title="${escapeHtml(p.fileName)}" class="px-2 py-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 rounded text-xs font-medium flex items-center space-x-1 mx-auto hover:bg-emerald-100 transition"><i data-lucide="paperclip" class="w-3 h-3"></i><span>Download</span></button>` 
           : `<span class="text-xs text-slate-400">None</span>`;
 
         tr.innerHTML = `
           <td class="py-3.5 px-4 font-mono font-semibold text-brand-600 dark:text-brand-400">Week ${weekNum}</td>
-          <td class="py-3.5 px-4 font-medium">${displayDateEth}</td>
+          <td class="py-3.5 px-4 font-medium">${displayDate}</td>
           <td class="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">${escapeHtml(p.presenter)}</td>
           <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300">${escapeHtml(p.topic)}</td>
           <td class="py-3.5 px-4 text-center" onclick="event.stopPropagation()">${fileBtnHtml}</td>
@@ -595,6 +524,7 @@
 
       lucide.createIcons();
       
+      // Auto-select first item for preview if none selected
       if (!selectedSessionId && filtered.length > 0) {
         selectSessionForPreview(filtered[0].id);
       } else if (filtered.length === 0) {
@@ -605,7 +535,7 @@
     function resetPreviewPane() {
       selectedSessionId = null;
       document.getElementById('previewWeek').textContent = 'Week # --';
-      document.getElementById('previewDate').textContent = 'DD/MM/YYYY E.C.';
+      document.getElementById('previewDate').textContent = 'DD/MM/YYYY';
       document.getElementById('previewTopic').textContent = 'Select a presentation to view formatted title details';
       document.getElementById('previewPresenter').textContent = '--';
       document.getElementById('attachedFileContainer').classList.add('hidden');
@@ -616,16 +546,16 @@
       const session = presentations.find(p => p.id === id);
       if (!session) return;
 
-      const ethDate = gregorianToEthiopianStr(session.date);
-      const mondayEth = getEthMonday(ethDate.year, ethDate.month, ethDate.day);
-      const weekNum = calculateWeekNumberEth(mondayEth.year, mondayEth.month, mondayEth.day);
-      const displayDateEth = formatEthDisplay(mondayEth);
+      const mondayStr = getMondayOfWeek(session.date);
+      const weekNum = calculateWeekNumber(mondayStr);
+      const displayDate = formatDisplayDate(mondayStr);
 
       document.getElementById('previewWeek').textContent = `Week #${weekNum}`;
-      document.getElementById('previewDate').textContent = displayDateEth;
+      document.getElementById('previewDate').textContent = displayDate;
       document.getElementById('previewTopic').textContent = session.topic;
       document.getElementById('previewPresenter').textContent = session.presenter;
 
+      // Toggle Attached File Download Button in Slide Card
       const attachedContainer = document.getElementById('attachedFileContainer');
       const attachedNameText = document.getElementById('attachedFileNameText');
       if (session.fileData) {
@@ -639,35 +569,31 @@
     }
 
     function updateStats() {
-      const todayIso = new Date().toISOString().split('T')[0];
-      const todayEth = gregorianToEthiopianStr(todayIso);
-      const todayMondayEth = getEthMonday(todayEth.year, todayEth.month, todayEth.day);
-      const todayMondayIso = ethiopianToGregorianStr(todayMondayEth.year, todayMondayEth.month, todayMondayEth.day);
-      const currentWeekNum = calculateWeekNumberEth(todayMondayEth.year, todayMondayEth.month, todayMondayEth.day);
+      // Calculate current week relative to today's date
+      const todayStr = formatISO(new Date());
+      const todayMondayStr = getMondayOfWeek(todayStr);
+      const currentWeekNum = calculateWeekNumber(todayStr);
 
       document.getElementById('statCurrentWeek').textContent = `Week ${currentWeekNum}`;
       document.getElementById('statTotalSessions').textContent = presentations.length;
 
+      // CHRONOLOGICAL NEXT PRESENTER LOGIC:
       const upcomingSessions = presentations
-        .filter(p => p.status === 'Scheduled' && p.date >= todayMondayIso)
+        .filter(p => p.status === 'Scheduled' && getMondayOfWeek(p.date) >= todayMondayStr)
         .sort((a, b) => a.date.localeCompare(b.date));
 
       if (upcomingSessions.length > 0) {
         const next = upcomingSessions[0];
-        const nextEth = gregorianToEthiopianStr(next.date);
-        const nextMondayEth = getEthMonday(nextEth.year, nextEth.month, nextEth.day);
-        document.getElementById('statNextDate').textContent = formatEthDisplay(nextMondayEth);
+        document.getElementById('statNextDate').textContent = formatDisplayDate(getMondayOfWeek(next.date));
         document.getElementById('statNextPresenter').textContent = next.presenter;
       } else {
         const futureSessions = presentations
-          .filter(p => p.date >= todayMondayIso)
+          .filter(p => getMondayOfWeek(p.date) >= todayMondayStr)
           .sort((a, b) => a.date.localeCompare(b.date));
 
         if (futureSessions.length > 0) {
           const next = futureSessions[0];
-          const nextEth = gregorianToEthiopianStr(next.date);
-          const nextMondayEth = getEthMonday(nextEth.year, nextEth.month, nextEth.day);
-          document.getElementById('statNextDate').textContent = formatEthDisplay(nextMondayEth);
+          document.getElementById('statNextDate').textContent = formatDisplayDate(getMondayOfWeek(next.date));
           document.getElementById('statNextPresenter').textContent = next.presenter;
         } else {
           document.getElementById('statNextDate').textContent = 'None Scheduled';
@@ -675,6 +601,8 @@
         }
       }
     }
+
+    // --- FILE ATTACHMENT & DOWNLOAD HANDLERS ---
 
     function downloadAttachedFile() {
       if (!selectedSessionId) return;
@@ -691,24 +619,22 @@
       a.click();
     }
 
+    // --- MODAL & FORM ACTIONS ---
+
     function openAddModal() {
       document.getElementById('modalTitle').textContent = 'Schedule Presentation';
       document.getElementById('sessionId').value = '';
       document.getElementById('formPresenter').value = '';
       
-      const todayEth = gregorianToEthiopianStr(new Date().toISOString().split('T')[0]);
-      const defaultMondayEth = getEthMonday(todayEth.year, todayEth.month, todayEth.day);
-      
-      document.getElementById('formEthDay').value = defaultMondayEth.day;
-      document.getElementById('formEthMonth').value = defaultMondayEth.month;
-      document.getElementById('formEthYear').value = defaultMondayEth.year;
+      const defaultMonday = getMondayOfWeek(formatISO(new Date()));
+      document.getElementById('formDate').value = defaultMonday;
       document.getElementById('formTopic').value = '';
       document.getElementById('formFile').value = '';
       document.getElementById('existingFileNotice').classList.add('hidden');
       document.getElementById('formStatus').value = 'Scheduled';
 
       tempAttachedFileData = null;
-      autoCalculateWeekDisplayEth();
+      autoCalculateWeekDisplay();
       document.getElementById('sessionModal').classList.remove('hidden');
     }
 
@@ -716,14 +642,10 @@
       const session = presentations.find(p => p.id === id);
       if (!session) return;
 
-      const eth = gregorianToEthiopianStr(session.date);
-
       document.getElementById('modalTitle').textContent = 'Edit Presentation';
       document.getElementById('sessionId').value = session.id;
       document.getElementById('formPresenter').value = session.presenter;
-      document.getElementById('formEthDay').value = eth.day;
-      document.getElementById('formEthMonth').value = eth.month;
-      document.getElementById('formEthYear').value = eth.year;
+      document.getElementById('formDate').value = session.date;
       document.getElementById('formTopic').value = session.topic;
       document.getElementById('formStatus').value = session.status;
       document.getElementById('formFile').value = '';
@@ -737,7 +659,7 @@
       }
 
       tempAttachedFileData = session.fileData ? { name: session.fileName, data: session.fileData } : null;
-      autoCalculateWeekDisplayEth();
+      autoCalculateWeekDisplay();
       document.getElementById('sessionModal').classList.remove('hidden');
     }
 
@@ -750,15 +672,11 @@
       
       const id = document.getElementById('sessionId').value;
       const presenter = document.getElementById('formPresenter').value.trim();
-      const d = Number(document.getElementById('formEthDay').value);
-      const m = Number(document.getElementById('formEthMonth').value);
-      const y = Number(document.getElementById('formEthYear').value);
+      const rawDate = document.getElementById('formDate').value;
       const topic = document.getElementById('formTopic').value.trim();
       const status = document.getElementById('formStatus').value;
       const fileInput = document.getElementById('formFile');
-
-      const mondayEth = getEthMonday(y, m, d);
-      const gregorianIsoDate = ethiopianToGregorianStr(mondayEth.year, mondayEth.month, mondayEth.day);
+      const date = getMondayOfWeek(rawDate);
 
       const processSave = (fileName, fileData) => {
         if (id) {
@@ -767,7 +685,7 @@
             presentations[index] = { 
               id, 
               presenter, 
-              date: gregorianIsoDate, 
+              date, 
               topic, 
               status,
               fileName: fileName !== undefined ? fileName : (tempAttachedFileData ? tempAttachedFileData.name : null),
@@ -778,7 +696,7 @@
           const newSession = {
             id: Date.now().toString(),
             presenter,
-            date: gregorianIsoDate,
+            date,
             topic,
             status,
             fileName: fileName || null,
@@ -815,6 +733,8 @@
       renderScheduleTable();
       updateStats();
     }
+
+    // --- COPY / DOWNLOAD TITLE SLIDE HELPERS ---
 
     function copySlideText() {
       const topic = document.getElementById('previewTopic').textContent;
@@ -874,6 +794,8 @@
       URL.revokeObjectURL(url);
     }
 
+    // --- DARK / LIGHT THEME TOGGLE ---
+
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
       document.getElementById('themeIcon').setAttribute('data-lucide', isDark ? 'sun' : 'moon');
@@ -884,6 +806,7 @@
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
+    // Initialize application on load
     window.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
