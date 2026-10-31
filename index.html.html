@@ -1,914 +1,715 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monday Presentation Scheduler - Cloud Sync</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monday Presentation Schedule</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#094d73',
+              900: '#0c4a6e',
             }
+          }
         }
-    </script>
-    <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .dark ::-webkit-scrollbar-thumb { background: #334155; }
-    </style>
+      }
+    };
+  </script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
 
-    <!-- Header / Navbar -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                
-                <!-- Logo / Title -->
-                <div class="flex items-center gap-3">
-                    <div class="bg-indigo-600 text-white p-2.5 rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20">
-                        <i class="fa-solid fa-chalkboard-user text-xl"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Monday Spotlight</h1>
-                            <!-- Realtime Sync Badge -->
-                            <span id="syncBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                                <span id="syncStatusText">Connecting...</span>
-                            </span>
-                        </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Live Workplace Presentation Hub</p>
-                    </div>
-                </div>
-
-                <!-- Right Header Controls -->
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <!-- Dark Mode Toggle -->
-                    <button id="themeToggleBtn" title="Toggle Theme" class="p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors">
-                        <i class="fa-solid fa-moon dark:hidden"></i>
-                        <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
-                    </button>
-
-                    <button id="setupProgramBtn" class="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-slate-500 dark:text-slate-400"></i>
-                        <span class="hidden sm:inline">Program Setup</span>
-                    </button>
-                    
-                    <button id="addSessionBtn" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-plus text-xs"></i>
-                        <span>New Presentation</span>
-                    </button>
-                </div>
-            </div>
+  <!-- TOP BAR / HEADER -->
+  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-brand-500 text-white rounded-lg shadow-sm">
+          <i data-lucide="presentation" class="w-6 h-6"></i>
         </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-
-        <!-- Metrics Dashboard Banner -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Program Origin</p>
-                    <h3 id="statStartDate" class="text-lg font-bold text-slate-800 dark:text-white mt-1">--</h3>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg">
-                    <i class="fa-regular fa-calendar-check"></i>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Current Week</p>
-                    <h3 id="statCurrentWeek" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">Week --</h3>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg">
-                    <i class="fa-solid fa-hashtag"></i>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Next Presenter</p>
-                    <h3 id="statNextPresenter" class="text-base font-bold text-slate-800 dark:text-white mt-1 truncate max-w-[140px]">--</h3>
-                    <p id="statNextDate" class="text-xs text-slate-500 dark:text-slate-400">--</p>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg">
-                    <i class="fa-solid fa-user-clock"></i>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Total Delivered</p>
-                    <h3 id="statCompletedCount" class="text-2xl font-bold text-slate-800 dark:text-white mt-1">0</h3>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg">
-                    <i class="fa-solid fa-award"></i>
-                </div>
-            </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight text-slate-900 dark:text-white">Monday Presentation Hub</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Automated Weekly Schedule & Slide Formatting</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <!-- Permanent Program Info Pill -->
+        <div class="hidden sm:flex items-center space-x-2 bg-slate-100 dark:bg-slate-700/60 px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300">
+          <i data-lucide="flag" class="w-3.5 h-3.5 text-brand-500"></i>
+          <span>Program Start: <strong>13/07/2026</strong></span>
         </div>
 
-        <!-- Controls Bar (Search, Filter, Tab Views) -->
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
-            <!-- Search & Filters -->
-            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1">
-                <div class="relative flex-1 max-w-xs">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text" id="searchInput" placeholder="Search presenter or topic..." class="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <select id="statusFilter" class="px-3.5 py-2 text-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="ALL">All Statuses</option>
-                    <option value="Upcoming">Upcoming</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Postponed">Postponed</option>
-                </select>
-            </div>
+        <!-- Dark Mode Toggle -->
+        <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+          <i data-lucide="moon" id="themeIcon" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </header>
 
-            <!-- View Switcher -->
-            <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-full sm:w-auto justify-center">
-                <button id="viewScheduleBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all shadow-sm bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400">
-                    <i class="fa-solid fa-list-ul mr-1.5"></i> Roster Schedule
-                </button>
-                <button id="viewCoverGenBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                    <i class="fa-solid fa-file-powerpoint mr-1.5"></i> Slide Generator
-                </button>
-            </div>
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+
+    <!-- OVERVIEW STATS CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center space-x-4">
+        <div class="p-3 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl">
+          <i data-lucide="calendar-range" class="w-6 h-6"></i>
         </div>
-
-        <!-- VIEW 1: Roster Table -->
-        <section id="scheduleViewSection" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px] font-semibold">
-                        <tr>
-                            <th scope="col" class="py-4 px-4 text-center">Week #</th>
-                            <th scope="col" class="py-4 px-4">Date</th>
-                            <th scope="col" class="py-4 px-4">Presenter</th>
-                            <th scope="col" class="py-4 px-4">Topic / Title</th>
-                            <th scope="col" class="py-4 px-4 text-center">Status</th>
-                            <th scope="col" class="py-4 px-4">Presentation File</th>
-                            <th scope="col" class="py-4 px-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="presentationTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/50 text-slate-700 dark:text-slate-200">
-                        <!-- Populated dynamically -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="emptyState" class="hidden py-12 text-center">
-                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
-                    <i class="fa-solid fa-folder-open"></i>
-                </div>
-                <h4 class="text-base font-semibold text-slate-700 dark:text-slate-200">No presentations found</h4>
-                <p class="text-sm text-slate-400 mt-1">Try adjusting your filter or add a new scheduled presentation.</p>
-            </div>
-        </section>
-
-        <!-- VIEW 2: PowerPoint Cover Slide Generator -->
-        <section id="coverGeneratorSection" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-indigo-900 via-slate-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold mb-2 border border-indigo-500/30">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Cover Slide Generator
-                    </div>
-                    <h2 class="text-2xl font-bold tracking-tight">PowerPoint Title Slide Preview</h2>
-                    <p class="text-slate-300 text-sm mt-1 max-w-xl">
-                        Select a presentation from the roster to generate a standard title slide formatted with calculated week numbers.
-                    </p>
-                </div>
-                <div class="w-full md:w-auto">
-                    <select id="coverSelectSession" class="w-full md:w-64 px-3.5 py-2.5 text-sm bg-slate-800/80 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <!-- Populated dynamically -->
-                    </select>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Slide Visual Canvas -->
-                <div class="lg:col-span-2 bg-slate-200 dark:bg-slate-950 p-6 md:p-8 rounded-2xl border border-slate-300 dark:border-slate-800 flex items-center justify-center min-h-[380px]">
-                    <div id="slideCanvas" class="w-full aspect-[16/9] bg-white rounded-2xl shadow-2xl p-8 md:p-12 flex flex-col justify-between border border-slate-100 relative overflow-hidden text-slate-900">
-                        <!-- Slide Header -->
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-center gap-2">
-                                <div class="w-3.5 h-3.5 rounded-full bg-indigo-600"></div>
-                                <span class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Weekly Workplace Spotlight</span>
-                            </div>
-                            <span id="slideWeekBadge" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-xl text-xs md:text-sm border border-indigo-100">
-                                Week -- Presentation
-                            </span>
-                        </div>
-
-                        <!-- Slide Title -->
-                        <div class="my-auto py-4">
-                            <h1 id="slideTitle" class="text-xl sm:text-2xl md:text-4xl font-extrabold text-slate-900 leading-tight tracking-tight">
-                                Select a presentation title
-                            </h1>
-                            <div class="w-20 h-1.5 bg-indigo-600 rounded-full mt-4"></div>
-                        </div>
-
-                        <!-- Slide Footer -->
-                        <div class="pt-4 border-t border-slate-100 flex justify-between items-end">
-                            <div>
-                                <p class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Presented By</p>
-                                <p id="slidePresenter" class="text-sm md:text-xl font-bold text-slate-800 mt-0.5">--</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Date</p>
-                                <p id="slideDate" class="text-xs md:text-sm font-semibold text-slate-600 mt-0.5">--</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Export Options -->
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col justify-between space-y-6">
-                    <div class="space-y-4">
-                        <h3 class="text-base font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-3">Quick Export Tools</h3>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Standardized Header Text</label>
-                            <textarea id="slideCopyText" readonly rows="4" class="w-full text-xs font-mono p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 resize-none focus:outline-none"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <button id="copySlideTextBtn" class="w-full py-2.5 px-4 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
-                            <i class="fa-regular fa-copy"></i>
-                            <span>Copy Slide Text Info</span>
-                        </button>
-                        
-                        <button id="downloadCoverHTMLBtn" class="w-full py-2.5 px-4 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white font-semibold rounded-xl text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-download"></i>
-                            <span>Download Title Slide (.HTML)</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Modal 1: Add / Edit Presentation Modal -->
-    <div id="presentationModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 max-w-lg w-full overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/30">
-                <h3 id="modalHeading" class="font-bold text-slate-900 dark:text-white text-lg">Add New Presentation</h3>
-                <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full flex items-center justify-center">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <form id="presentationForm" class="p-6 space-y-4">
-                <input type="hidden" id="editSessionId" value="">
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Presenter Name *</label>
-                    <input type="text" id="formPresenter" required placeholder="e.g., Sarah Jenkins" class="w-full px-3.5 py-2 text-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Presentation Topic / Title *</label>
-                    <input type="text" id="formTopic" required placeholder="e.g., Q3 Growth Strategy & Market Trends" class="w-full px-3.5 py-2 text-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Date *</label>
-                        <input type="date" id="formDate" required class="w-full px-3.5 py-2 text-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <p class="text-[11px] text-slate-400 mt-1">Snaps automatically to Monday</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Status</label>
-                        <select id="formStatus" class="w-full px-3.5 py-2 text-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="Upcoming">Upcoming</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Postponed">Postponed</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Presentation File / Link (Drive, PPT, etc.)</label>
-                    <input type="url" id="formDeckUrl" placeholder="https://drive.google.com/..." class="w-full px-3.5 py-2 text-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-between">
-                    <span class="text-xs text-indigo-700 dark:text-indigo-300 font-medium">Calculated Program Week:</span>
-                    <span id="calculatedWeekBadge" class="text-sm font-bold text-indigo-800 dark:text-indigo-200">Week --</span>
-                </div>
-
-                <div class="pt-3 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-700">
-                    <button type="button" id="cancelFormBtn" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl">Cancel</button>
-                    <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-500/20">Save Presentation</button>
-                </div>
-            </form>
+        <div>
+          <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Current Week</p>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white" id="statCurrentWeek">Week --</h3>
         </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center space-x-4">
+        <div class="p-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
+          <i data-lucide="users" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Sessions</p>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white" id="statTotalSessions">0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center space-x-4">
+        <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl">
+          <i data-lucide="clock" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Next Monday</p>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white truncate" id="statNextDate">--</h3>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center space-x-4">
+        <div class="p-3 bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 rounded-xl">
+          <i data-lucide="user-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Next Presenter</p>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white truncate" id="statNextPresenter">None Scheduled</h3>
+        </div>
+      </div>
     </div>
 
-    <!-- Modal 2: Program Setup Modal -->
-    <div id="setupModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 max-w-md w-full overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/30">
-                <h3 class="font-bold text-slate-900 dark:text-white text-lg">Program Setup</h3>
-                <button id="closeSetupBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full flex items-center justify-center">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
+    <!-- MAIN TWO COLUMN WORKSPACE -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <div class="p-6 space-y-4">
-                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                    Set the official start date for your workplace program. All week numbers across the entire roster are calculated dynamically relative to this date.
-                </p>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">Program Start Date (Week 1)</label>
-                    <input type="date" id="setupStartDate" class="w-full px-3.5 py-2 text-sm border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <div class="pt-3 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-700">
-                    <button type="button" id="cancelSetupBtn" class="px-4 py-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl">Cancel</button>
-                    <button type="button" id="saveSetupBtn" class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-500/20">Update Start Date</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification Toast -->
-    <div id="toastNotification" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl transform transition-all duration-300 translate-y-20 opacity-0 flex items-center gap-3 z-50">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
-        <span id="toastMessage" class="text-xs font-medium">Notification message</span>
-    </div>
-
-    <!-- Firebase SDK Imports & App Initialization -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global environment variables or fallback defaults
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'monday-presentation-scheduler';
+      <!-- LEFT COLUMN: SCHEDULE MANAGEMENT (2 COLS) -->
+      <div class="lg:col-span-2 space-y-6">
         
-        // Fallback default config if running outside embedded environment
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : {
-                apiKey: "demo-api-key",
-                authDomain: "demo-project.firebaseapp.com",
-                projectId: "demo-project",
-                storageBucket: "demo-project.appspot.com",
-                messagingSenderId: "123456789",
-                appId: "1:123456789:web:demo"
-            };
+        <!-- CONTROL BAR (Search & Add Button) -->
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="relative w-full sm:w-72">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input 
+              type="text" 
+              id="searchInput"
+              oninput="renderScheduleTable()"
+              placeholder="Search presenter or topic..." 
+              class="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"
+            >
+          </div>
 
-        // Initialize Firebase Services
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+          <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+            <button 
+              onclick="openAddModal()"
+              class="w-full sm:w-auto px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-medium text-sm rounded-lg flex items-center justify-center space-x-2 shadow-sm transition"
+            >
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Schedule Monday Session</span>
+            </button>
+          </div>
+        </div>
 
-        // State variables
-        let currentUser = null;
-        let appConfig = { startDate: '2026-01-05' };
-        let presentations = [];
+        <!-- TABLE OF PRESENTATIONS -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <th class="py-3 px-4">Week</th>
+                  <th class="py-3 px-4">Monday Date</th>
+                  <th class="py-3 px-4">Presenter</th>
+                  <th class="py-3 px-4">Topic / Title</th>
+                  <th class="py-3 px-4 text-center">Status</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/60 text-slate-700 dark:text-slate-200">
+                <!-- Dynamically Rendered -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Empty State -->
+          <div id="emptyState" class="hidden py-12 text-center text-slate-400 dark:text-slate-500">
+            <i data-lucide="calendar-x" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
+            <p class="text-sm font-medium">No presentations found matching your filter.</p>
+          </div>
+        </div>
 
-        // Collection references (Mandatory Path Guidelines)
-        const configDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'program_config', 'settings');
-        const presentationsCollRef = collection(db, 'artifacts', appId, 'public', 'data', 'presentations');
+      </div>
 
-        // Dark Mode Setup
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        themeToggleBtn.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-        });
+      <!-- RIGHT COLUMN: AUTOMATED TITLE SLIDE PREVIEW (1 COL) -->
+      <div class="lg:col-span-1">
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm sticky top-24 space-y-4">
+          
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+            <h2 class="font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <i data-lucide="file-text" class="w-4 h-4 text-brand-500"></i>
+              <span>PowerPoint Cover Text</span>
+            </h2>
+            <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded font-mono">Live Format</span>
+          </div>
 
-        // Initialize Auth
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Firebase Authentication Error:", err);
-                updateSyncStatus(false, "Offline / Local Mode");
-            }
-        }
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Select any presentation from the schedule to automatically format its title slide attributes.
+          </p>
 
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                updateSyncStatus(true, "Cloud Synced");
-                subscribeToCloudData();
-            }
-        });
-
-        function updateSyncStatus(isSynced, text) {
-            const badge = document.getElementById('syncBadge');
-            const textEl = document.getElementById('syncStatusText');
-            textEl.textContent = text;
-
-            if (isSynced) {
-                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300";
-            } else {
-                badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300";
-            }
-        }
-
-        // Realtime Data Subscription
-        function subscribeToCloudData() {
-            if (!currentUser) return;
-
-            // Subscribe to Config Doc
-            onSnapshot(configDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    appConfig = docSnap.data();
-                } else {
-                    // Seed initial config
-                    setDoc(configDocRef, appConfig);
-                }
-                renderDashboard();
-            }, (error) => {
-                console.error("Config Listener Error:", error);
-            });
-
-            // Subscribe to Presentations Collection
-            onSnapshot(presentationsCollRef, (snapshot) => {
-                const list = [];
-                snapshot.forEach((doc) => {
-                    list.push({ id: doc.id, ...doc.data() });
-                });
-                presentations = list;
-                renderDashboard();
-            }, (error) => {
-                console.error("Presentations Listener Error:", error);
-            });
-        }
-
-        // Date Calculations & Helpers
-        function parseLocalDate(dateStr) {
-            const [year, month, day] = dateStr.split('-').map(Number);
-            return new Date(year, month - 1, day);
-        }
-
-        function formatDateString(dateStr) {
-            const date = parseLocalDate(dateStr);
-            return date.toLocaleDateString('en-US', {
-                weekday: 'short',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-
-        function formatLongDateString(dateStr) {
-            const date = parseLocalDate(dateStr);
-            return date.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-
-        function getNextOrSameMonday(dateObj) {
-            const day = dateObj.getDay();
-            const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1);
-            const monday = new Date(dateObj.setDate(diff));
-            return monday.toISOString().split('T')[0];
-        }
-
-        function calculateWeekNumber(dateStr) {
-            if (!appConfig.startDate) return 1;
-            const start = parseLocalDate(appConfig.startDate);
-            const target = parseLocalDate(dateStr);
-            const diffTime = target - start;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            const weekNum = Math.floor(diffDays / 7) + 1;
-            return weekNum > 0 ? weekNum : 1;
-        }
-
-        function showToast(message, isSuccess = true) {
-            const toast = document.getElementById('toastNotification');
-            const msgEl = document.getElementById('toastMessage');
-            const iconEl = document.getElementById('toastIcon');
-
-            msgEl.textContent = message;
-            iconEl.className = isSuccess 
-                ? 'fa-solid fa-circle-check text-emerald-400' 
-                : 'fa-solid fa-circle-exclamation text-amber-400';
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        // Render Functions
-        function renderDashboard() {
-            presentations.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            document.getElementById('statStartDate').textContent = formatDateString(appConfig.startDate);
+          <!-- SLIDE PREVIEW BOX -->
+          <div id="slidePreviewCard" class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl p-6 shadow-md flex flex-col justify-between min-h-[220px] relative overflow-hidden border border-slate-700">
+            <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
             
-            const todayStr = new Date().toISOString().split('T')[0];
-            const currentWeek = calculateWeekNumber(todayStr);
-            document.getElementById('statCurrentWeek').textContent = `Week ${currentWeek}`;
+            <div>
+              <div class="flex items-center justify-between text-xs text-brand-400 font-mono tracking-wider font-semibold uppercase mb-2">
+                <span id="previewWeek">Week # --</span>
+                <span id="previewDate">DD/MM/YYYY</span>
+              </div>
+              <h3 id="previewTopic" class="text-lg font-bold text-white leading-snug line-clamp-3">
+                Select a presentation to view formatted title details
+              </h3>
+            </div>
 
-            const upcomingList = presentations.filter(p => p.status === 'Upcoming');
-            if (upcomingList.length > 0) {
-                document.getElementById('statNextPresenter').textContent = upcomingList[0].presenter;
-                document.getElementById('statNextDate').textContent = formatDateString(upcomingList[0].date);
-            } else {
-                document.getElementById('statNextPresenter').textContent = 'None Scheduled';
-                document.getElementById('statNextDate').textContent = '--';
-            }
+            <div class="pt-6 border-t border-slate-700/60 mt-4 flex justify-between items-end">
+              <div>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest">Presenter</p>
+                <p id="previewPresenter" class="text-sm font-semibold text-slate-100">--</p>
+              </div>
+              <div class="text-right">
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest">Format</p>
+                <p class="text-xs text-slate-300 font-mono">Standard Slide</p>
+              </div>
+            </div>
+          </div>
 
-            const completedCount = presentations.filter(p => p.status === 'Completed').length;
-            document.getElementById('statCompletedCount').textContent = completedCount;
+          <!-- ACTIONS FOR SLIDE TEXT -->
+          <div class="space-y-2 pt-2">
+            <button 
+              onclick="copySlideText()"
+              class="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium text-xs rounded-lg flex items-center justify-center space-x-2 transition"
+            >
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copy Formatted Title Slide Text</span>
+            </button>
+            <button 
+              onclick="downloadSlideHTML()"
+              class="w-full py-2 px-3 bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/30 dark:hover:bg-brand-900/40 text-brand-700 dark:text-brand-300 font-medium text-xs rounded-lg flex items-center justify-center space-x-2 transition border border-brand-200 dark:border-brand-800"
+            >
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Download Standalone Title Slide File</span>
+            </button>
+          </div>
 
-            renderTable();
-            populateCoverDropdown();
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ADD / EDIT MODAL -->
+  <div id="sessionModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-700">
+      
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <h3 id="modalTitle" class="font-bold text-slate-900 dark:text-white">Schedule Presentation</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="sessionForm" onsubmit="handleSaveSession(event)" class="p-6 space-y-4">
+        <input type="hidden" id="sessionId">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Presenter Name *
+          </label>
+          <input 
+            type="text" 
+            id="formPresenter" 
+            required
+            placeholder="e.g. Alex Morgan"
+            class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Presentation Date (Select Monday) *
+          </label>
+          <!-- Native Calendar Picker Input -->
+          <input 
+            type="date" 
+            id="formDate" 
+            required
+            onchange="autoCalculateWeekDisplay()"
+            class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"
+          >
+          <p class="text-[11px] text-slate-400 mt-1">If you select another day, it will automatically align to that week's Monday.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Calculated Week Number
+          </label>
+          <input 
+            type="text" 
+            id="formWeekDisplay" 
+            readonly 
+            disabled 
+            placeholder="Auto-calculated from date..."
+            class="w-full px-3 py-2 text-sm bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-400 font-mono font-medium"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Presentation Title / Topic *
+          </label>
+          <input 
+            type="text" 
+            id="formTopic" 
+            required
+            placeholder="e.g. Introduction to Cloud Architecture"
+            class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Status
+          </label>
+          <select 
+            id="formStatus" 
+            class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white"
+          >
+            <option value="Scheduled">Scheduled</option>
+            <option value="Completed">Completed</option>
+            <option value="Postponed">Postponed</option>
+          </select>
+        </div>
+
+        <div class="pt-4 flex items-center justify-end space-x-2 border-t border-slate-100 dark:border-slate-700">
+          <button 
+            type="button" 
+            onclick="closeModal()" 
+            class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="px-4 py-2 text-xs font-medium bg-brand-500 hover:bg-brand-600 text-white rounded-lg transition shadow-sm"
+          >
+            Save Presentation
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC -->
+  <script>
+    // PERMANENT PROGRAM START DATE: 13/07/2026 (YYYY-MM-DD format for local date math)
+    const PROGRAM_START_DATE_STR = "2026-07-13"; 
+    
+    // Core Data State
+    let presentations = [];
+    let selectedSessionId = null;
+
+    // Load initial data from LocalStorage
+    function initApp() {
+      const saved = localStorage.getItem('monday_presentations_data');
+      if (saved) {
+        try {
+          presentations = JSON.parse(saved);
+        } catch (e) {
+          presentations = [];
         }
+      }
 
-        function renderTable() {
-            const tbody = document.getElementById('presentationTableBody');
-            const emptyState = document.getElementById('emptyState');
-            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value;
+      // Seed initial sample data if empty
+      if (!presentations || presentations.length === 0) {
+        presentations = [
+          {
+            id: '1',
+            presenter: 'Esmelealem Berhanu',
+            date: '2026-07-13',
+            topic: 'Kickoff: Software Engineering Workflows & Automation',
+            status: 'Completed'
+          },
+          {
+            id: '2',
+            presenter: 'Abebe Bikila',
+            date: '2026-07-20',
+            topic: 'Modern Mobile Development Practices',
+            status: 'Scheduled'
+          }
+        ];
+        saveData();
+      }
 
-            tbody.innerHTML = '';
+      renderScheduleTable();
+      updateStats();
+      lucide.createIcons();
+    }
 
-            const filtered = presentations.filter(item => {
-                const matchesSearch = item.presenter.toLowerCase().includes(searchQuery) || 
-                                      item.topic.toLowerCase().includes(searchQuery);
-                const matchesStatus = statusFilter === 'ALL' || item.status === statusFilter;
-                return matchesSearch && matchesStatus;
-            });
+    // Save Data to LocalStorage
+    function saveData() {
+      localStorage.setItem('monday_presentations_data', JSON.stringify(presentations));
+    }
 
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
+    // --- DATE & WEEK HELPER FUNCTIONS ---
 
-                filtered.forEach(item => {
-                    const weekNum = calculateWeekNumber(item.date);
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors";
+    // Parse 'YYYY-MM-DD' as local Date object (prevents 1-day UTC shift)
+    function parseLocalDate(dateStr) {
+      if (!dateStr) return new Date();
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
 
-                    let statusBadgeClass = "";
-                    if (item.status === 'Completed') {
-                        statusBadgeClass = "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
-                    } else if (item.status === 'Upcoming') {
-                        statusBadgeClass = "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800";
-                    } else {
-                        statusBadgeClass = "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800";
-                    }
+    // Format local Date object to 'YYYY-MM-DD' string
+    function formatISO(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
 
-                    tr.innerHTML = `
-                        <td class="py-4 px-4 text-center">
-                            <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600">
-                                Week ${weekNum}
-                            </span>
-                        </td>
-                        <td class="py-4 px-4 font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
-                            ${formatDateString(item.date)}
-                        </td>
-                        <td class="py-4 px-4">
-                            <div class="font-semibold text-slate-900 dark:text-white">${item.presenter}</div>
-                        </td>
-                        <td class="py-4 px-4">
-                            <div class="font-medium text-slate-800 dark:text-slate-200 max-w-xs sm:max-w-md truncate" title="${item.topic}">
-                                ${item.topic}
-                            </div>
-                        </td>
-                        <td class="py-4 px-4 text-center">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${statusBadgeClass}">
-                                ${item.status}
-                            </span>
-                        </td>
-                        <td class="py-4 px-4">
-                            ${item.deckUrl ? `
-                                <a href="${item.deckUrl}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-                                    <i class="fa-solid fa-paperclip"></i> View Deck
-                                </a>
-                            ` : `<span class="text-xs text-slate-400">No link</span>`}
-                        </td>
-                        <td class="py-4 px-4 text-right whitespace-nowrap">
-                            <button data-action="cover" data-id="${item.id}" title="Generate Title Slide" class="p-1.5 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors mr-1">
-                                <i class="fa-solid fa-file-powerpoint"></i>
-                            </button>
-                            <button data-action="edit" data-id="${item.id}" title="Edit" class="p-1.5 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors mr-1">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <button data-action="delete" data-id="${item.id}" title="Delete" class="p-1.5 text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+    // Format Date string 'YYYY-MM-DD' to strict 'DD/MM/YYYY' for UI display
+    function formatDisplayDate(dateStr) {
+      if (!dateStr) return '--/--/----';
+      const [year, month, day] = dateStr.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    // Snap any selected date to the Monday of that week
+    function getMondayOfWeek(dateStr) {
+      const date = parseLocalDate(dateStr);
+      const day = date.getDay();
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Sunday
+      const monday = new Date(date.setDate(diff));
+      return formatISO(monday);
+    }
+
+    // Calculate Week Number relative to permanent start date (13/07/2026)
+    function calculateWeekNumber(targetDateStr) {
+      const mondayTargetStr = getMondayOfWeek(targetDateStr);
+      const start = parseLocalDate(PROGRAM_START_DATE_STR);
+      const target = parseLocalDate(mondayTargetStr);
+      
+      const diffTime = target.getTime() - start.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      const weekNum = Math.floor(diffDays / 7) + 1;
+      
+      return weekNum > 0 ? weekNum : 1;
+    }
+
+    // Triggered on Calendar Picker Change inside Modal
+    function autoCalculateWeekDisplay() {
+      const rawDateVal = document.getElementById('formDate').value;
+      if (!rawDateVal) return;
+      
+      // Auto-snap calendar input to Monday
+      const mondayStr = getMondayOfWeek(rawDateVal);
+      document.getElementById('formDate').value = mondayStr;
+
+      const weekNum = calculateWeekNumber(mondayStr);
+      document.getElementById('formWeekDisplay').value = `Week ${weekNum}`;
+    }
+
+    // --- RENDER FUNCTIONS ---
+
+    function renderScheduleTable() {
+      const tbody = document.getElementById('scheduleTableBody');
+      const emptyState = document.getElementById('emptyState');
+      const searchQuery = (document.getElementById('searchInput').value || '').toLowerCase();
+
+      // Sort by date ascending
+      let filtered = [...presentations].sort((a, b) => a.date.localeCompare(b.date));
+
+      if (searchQuery) {
+        filtered = filtered.filter(p => 
+          p.presenter.toLowerCase().includes(searchQuery) || 
+          p.topic.toLowerCase().includes(searchQuery)
+        );
+      }
+
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      filtered.forEach(p => {
+        const mondayStr = getMondayOfWeek(p.date);
+        const weekNum = calculateWeekNumber(mondayStr);
+        const displayDate = formatDisplayDate(mondayStr);
+        const isSelected = p.id === selectedSessionId;
+
+        const tr = document.createElement('tr');
+        tr.className = `border-b border-slate-100 dark:border-slate-700/60 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition cursor-pointer ${isSelected ? 'bg-brand-50/50 dark:bg-brand-950/20' : ''}`;
+        tr.onclick = () => selectSessionForPreview(p.id);
+
+        let statusBadgeClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
+        if (p.status === 'Completed') statusBadgeClass = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300';
+        if (p.status === 'Postponed') statusBadgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
+
+        tr.innerHTML = `
+          <td class="py-3.5 px-4 font-mono font-semibold text-brand-600 dark:text-brand-400">Week ${weekNum}</td>
+          <td class="py-3.5 px-4 font-medium">${displayDate}</td>
+          <td class="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">${escapeHtml(p.presenter)}</td>
+          <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300">${escapeHtml(p.topic)}</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadgeClass}">
+              ${p.status}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 text-right space-x-1" onclick="event.stopPropagation()">
+            <button onclick="openEditModal('${p.id}')" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+              <i data-lucide="pencil" class="w-4 h-4"></i>
+            </button>
+            <button onclick="deleteSession('${p.id}')" class="p-1 text-slate-400 hover:text-red-500">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      lucide.createIcons();
+      
+      // Auto-select first item for preview if none selected
+      if (!selectedSessionId && filtered.length > 0) {
+        selectSessionForPreview(filtered[0].id);
+      }
+    }
+
+    function selectSessionForPreview(id) {
+      selectedSessionId = id;
+      const session = presentations.find(p => p.id === id);
+      if (!session) return;
+
+      const mondayStr = getMondayOfWeek(session.date);
+      const weekNum = calculateWeekNumber(mondayStr);
+      const displayDate = formatDisplayDate(mondayStr);
+
+      document.getElementById('previewWeek').textContent = `Week #${weekNum}`;
+      document.getElementById('previewDate').textContent = displayDate;
+      document.getElementById('previewTopic').textContent = session.topic;
+      document.getElementById('previewPresenter').textContent = session.presenter;
+
+      renderScheduleTable();
+    }
+
+    function updateStats() {
+      // Calculate current week relative to today's date
+      const todayStr = formatISO(new Date());
+      const currentWeekNum = calculateWeekNumber(todayStr);
+
+      document.getElementById('statCurrentWeek').textContent = `Week ${currentWeekNum}`;
+      document.getElementById('statTotalSessions').textContent = presentations.length;
+
+      // Find upcoming sessions
+      const scheduled = presentations
+        .filter(p => p.status === 'Scheduled')
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      if (scheduled.length > 0) {
+        const next = scheduled[0];
+        document.getElementById('statNextDate').textContent = formatDisplayDate(getMondayOfWeek(next.date));
+        document.getElementById('statNextPresenter').textContent = next.presenter;
+      } else {
+        document.getElementById('statNextDate').textContent = 'None Scheduled';
+        document.getElementById('statNextPresenter').textContent = 'None';
+      }
+    }
+
+    // --- MODAL & FORM ACTIONS ---
+
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = 'Schedule Presentation';
+      document.getElementById('sessionId').value = '';
+      document.getElementById('formPresenter').value = '';
+      
+      // Default to next Monday
+      const defaultMonday = getMondayOfWeek(formatISO(new Date()));
+      document.getElementById('formDate').value = defaultMonday;
+      document.getElementById('formTopic').value = '';
+      document.getElementById('formStatus').value = 'Scheduled';
+
+      autoCalculateWeekDisplay();
+      document.getElementById('sessionModal').classList.remove('hidden');
+    }
+
+    function openEditModal(id) {
+      const session = presentations.find(p => p.id === id);
+      if (!session) return;
+
+      document.getElementById('modalTitle').textContent = 'Edit Presentation';
+      document.getElementById('sessionId').value = session.id;
+      document.getElementById('formPresenter').value = session.presenter;
+      document.getElementById('formDate').value = session.date;
+      document.getElementById('formTopic').value = session.topic;
+      document.getElementById('formStatus').value = session.status;
+
+      autoCalculateWeekDisplay();
+      document.getElementById('sessionModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('sessionModal').classList.add('hidden');
+    }
+
+    function handleSaveSession(e) {
+      e.preventDefault();
+      
+      const id = document.getElementById('sessionId').value;
+      const presenter = document.getElementById('formPresenter').value.trim();
+      const rawDate = document.getElementById('formDate').value;
+      const topic = document.getElementById('formTopic').value.trim();
+      const status = document.getElementById('formStatus').value;
+
+      const date = getMondayOfWeek(rawDate);
+
+      if (id) {
+        // Edit existing
+        const index = presentations.findIndex(p => p.id === id);
+        if (index !== -1) {
+          presentations[index] = { id, presenter, date, topic, status };
         }
+      } else {
+        // Create new
+        const newSession = {
+          id: Date.now().toString(),
+          presenter,
+          date,
+          topic,
+          status
+        };
+        presentations.push(newSession);
+        selectedSessionId = newSession.id;
+      }
 
-        // Table Action Event Listener (Delegation)
-        document.getElementById('presentationTableBody').addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn) return;
-            const action = btn.dataset.action;
-            const id = btn.dataset.id;
+      saveData();
+      renderScheduleTable();
+      updateStats();
+      closeModal();
+    }
 
-            if (action === 'cover') generateCoverForSession(id);
-            if (action === 'edit') editPresentation(id);
-            if (action === 'delete') deletePresentation(id);
-        });
+    function deleteSession(id) {
+      if (!confirm('Are you sure you want to remove this presentation from the schedule?')) return;
+      presentations = presentations.filter(p => p.id !== id);
+      if (selectedSessionId === id) selectedSessionId = null;
+      saveData();
+      renderScheduleTable();
+      updateStats();
+    }
 
-        // CRUD Actions via Cloud Firestore
-        function openPresentationModal(editId = null) {
-            const modal = document.getElementById('presentationModal');
-            const form = document.getElementById('presentationForm');
-            const heading = document.getElementById('modalHeading');
-            form.reset();
+    // --- COPY / DOWNLOAD TITLE SLIDE HELPERS ---
 
-            if (editId) {
-                const session = presentations.find(p => p.id === editId);
-                if (session) {
-                    heading.textContent = "Edit Presentation Session";
-                    document.getElementById('editSessionId').value = session.id;
-                    document.getElementById('formPresenter').value = session.presenter;
-                    document.getElementById('formTopic').value = session.topic;
-                    document.getElementById('formDate').value = session.date;
-                    document.getElementById('formStatus').value = session.status;
-                    document.getElementById('formDeckUrl').value = session.deckUrl || '';
-                    updateCalculatedWeekPreview(session.date);
-                }
-            } else {
-                heading.textContent = "Add New Presentation";
-                document.getElementById('editSessionId').value = '';
-                const today = new Date();
-                const nextMonday = getNextOrSameMonday(today);
-                document.getElementById('formDate').value = nextMonday;
-                updateCalculatedWeekPreview(nextMonday);
-            }
-            modal.classList.remove('hidden');
-        }
+    function copySlideText() {
+      const topic = document.getElementById('previewTopic').textContent;
+      const presenter = document.getElementById('previewPresenter').textContent;
+      const date = document.getElementById('previewDate').textContent;
+      const week = document.getElementById('previewWeek').textContent;
 
-        function closePresentationModal() {
-            document.getElementById('presentationModal').classList.add('hidden');
-        }
+      const formattedText = `TITLE: ${topic}\nPRESENTER: ${presenter}\nDATE: ${date}\nWEEK: ${week}`;
+      
+      navigator.clipboard.writeText(formattedText).then(() => {
+        alert('Slide cover text copied to clipboard!');
+      });
+    }
 
-        function updateCalculatedWeekPreview(dateStr) {
-            if (!dateStr) return;
-            const snappedDate = getNextOrSameMonday(parseLocalDate(dateStr));
-            const weekNum = calculateWeekNumber(snappedDate);
-            document.getElementById('calculatedWeekBadge').textContent = `Week ${weekNum}`;
-        }
+    function downloadSlideHTML() {
+      const topic = document.getElementById('previewTopic').textContent;
+      const presenter = document.getElementById('previewPresenter').textContent;
+      const date = document.getElementById('previewDate').textContent;
+      const week = document.getElementById('previewWeek').textContent;
 
-        function editPresentation(id) {
-            openPresentationModal(id);
-        }
-
-        async function deletePresentation(id) {
-            if (confirm("Are you sure you want to delete this scheduled presentation?")) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'presentations', id));
-                    showToast("Presentation deleted permanently.");
-                } catch (err) {
-                    console.error("Error deleting document:", err);
-                    showToast("Failed to delete item.", false);
-                }
-            }
-        }
-
-        // Cover Generator
-        function populateCoverDropdown() {
-            const select = document.getElementById('coverSelectSession');
-            select.innerHTML = '';
-
-            if (presentations.length === 0) {
-                select.innerHTML = '<option value="">No sessions available</option>';
-                return;
-            }
-
-            presentations.forEach(p => {
-                const weekNum = calculateWeekNumber(p.date);
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.textContent = `Week ${weekNum}: ${p.presenter} (${formatDateString(p.date)})`;
-                select.appendChild(opt);
-            });
-
-            if (select.value) renderSlidePreview(select.value);
-        }
-
-        function renderSlidePreview(sessionId) {
-            const session = presentations.find(p => p.id === sessionId);
-            if (!session) return;
-
-            const weekNum = calculateWeekNumber(session.date);
-            const formattedDate = formatLongDateString(session.date);
-
-            document.getElementById('slideWeekBadge').textContent = `Week ${weekNum} Presentation`;
-            document.getElementById('slideTitle').textContent = session.topic;
-            document.getElementById('slidePresenter').textContent = session.presenter;
-            document.getElementById('slideDate').textContent = formattedDate;
-
-            const formattedCopyText = `TOPIC: ${session.topic}\nPRESENTER: ${session.presenter}\nDATE: ${formattedDate}\nPROGRAM WEEK: Week ${weekNum}`;
-            document.getElementById('slideCopyText').value = formattedCopyText;
-        }
-
-        function generateCoverForSession(id) {
-            switchTab('cover');
-            document.getElementById('coverSelectSession').value = id;
-            renderSlidePreview(id);
-        }
-
-        function switchTab(viewName) {
-            const scheduleSection = document.getElementById('scheduleViewSection');
-            const coverSection = document.getElementById('coverGeneratorSection');
-            const scheduleBtn = document.getElementById('viewScheduleBtn');
-            const coverBtn = document.getElementById('viewCoverGenBtn');
-
-            if (viewName === 'schedule') {
-                scheduleSection.classList.remove('hidden');
-                coverSection.classList.add('hidden');
-                scheduleBtn.className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all shadow-sm bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400";
-                coverBtn.className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
-            } else {
-                scheduleSection.classList.add('hidden');
-                coverSection.classList.remove('hidden');
-                coverBtn.className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all shadow-sm bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400";
-                scheduleBtn.className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
-            }
-        }
-
-        function downloadCoverHTML() {
-            const title = document.getElementById('slideTitle').textContent;
-            const presenter = document.getElementById('slidePresenter').textContent;
-            const date = document.getElementById('slideDate').textContent;
-            const week = document.getElementById('slideWeekBadge').textContent;
-
-            const htmlContent = `<!DOCTYPE html>
+      const htmlContent = `
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Presentation Title Slide</title>
-    <style>
-        body { margin:0; padding:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .slide { width: 1280px; height: 720px; background: #ffffff; padding: 60px 80px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; }
-        .header { display: flex; justify-content: space-between; align-items: center; }
-        .badge { background: #e0e7ff; color: #4338ca; font-weight: bold; padding: 8px 16px; border-radius: 8px; font-size: 18px; }
-        .title { font-size: 44px; font-weight: 800; color: #0f172a; line-height: 1.2; margin: 0 0 20px 0; }
-        .bar { width: 80px; height: 6px; background: #4f46e5; border-radius: 3px; }
-        .footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #f1f5f9; padding-top: 20px; }
-        .label { font-size: 14px; text-transform: uppercase; color: #94a3b8; font-weight: 600; margin: 0; }
-        .val { font-size: 22px; font-weight: 700; color: #1e293b; margin-top: 4px; }
-    </style>
+  <meta charset="utf-8">
+  <title>Title Slide - ${topic}</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .slide { width: 80%; max-width: 900px; border: 2px solid #334155; padding: 60px; border-radius: 20px; background: #1e293b; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+    .meta { font-size: 18px; color: #38bdf8; font-weight: bold; font-family: monospace; letter-spacing: 2px; }
+    .title { font-size: 42px; margin: 25px 0 40px 0; line-height: 1.2; font-weight: 800; }
+    .footer { border-top: 1px solid #334155; pt: 20px; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .presenter-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+    .presenter-name { font-size: 22px; font-weight: 600; margin-top: 5px; }
+  </style>
 </head>
 <body>
-    <div class="slide">
-        <div class="header">
-            <span style="font-weight:700; color:#94a3b8; letter-spacing:2px; font-size:14px;">WEEKLY SPOTLIGHT</span>
-            <div class="badge">${week}</div>
-        </div>
-        <div class="title-box">
-            <h1 class="title">${title}</h1>
-            <div class="bar"></div>
-        </div>
-        <div class="footer">
-            <div>
-                <p class="label">Presented By</p>
-                <p class="val">${presenter}</p>
-            </div>
-            <div style="text-align:right;">
-                <p class="label">Date</p>
-                <p class="val">${date}</p>
-            </div>
-        </div>
+  <div class="slide">
+    <div class="meta">${week} &bull; ${date}</div>
+    <div class="title">${topic}</div>
+    <div class="footer">
+      <div>
+        <div class="presenter-label">Presented By</div>
+        <div class="presenter-name">${presenter}</div>
+      </div>
     </div>
+  </div>
 </body>
 </html>`;
 
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Slide_${presenter.replace(/\s+/g, '_')}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast("Title Slide HTML template downloaded!");
-        }
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Slide_${week.replace('#', '').replace(' ', '_')}.html`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
 
-        // DOM Event Binding & Init
-        document.addEventListener('DOMContentLoaded', () => {
-            initAuth();
+    // --- DARK / LIGHT THEME TOGGLE ---
 
-            document.getElementById('viewScheduleBtn').addEventListener('click', () => switchTab('schedule'));
-            document.getElementById('viewCoverGenBtn').addEventListener('click', () => switchTab('cover'));
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      document.getElementById('themeIcon').setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+      lucide.createIcons();
+    }
 
-            document.getElementById('searchInput').addEventListener('input', renderTable);
-            document.getElementById('statusFilter').addEventListener('change', renderTable);
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
 
-            document.getElementById('addSessionBtn').addEventListener('click', () => openPresentationModal());
-            document.getElementById('closeModalBtn').addEventListener('click', closePresentationModal);
-            document.getElementById('cancelFormBtn').addEventListener('click', closePresentationModal);
-
-            document.getElementById('formDate').addEventListener('change', (e) => {
-                if (e.target.value) {
-                    const snapped = getNextOrSameMonday(parseLocalDate(e.target.value));
-                    e.target.value = snapped;
-                    updateCalculatedWeekPreview(snapped);
-                }
-            });
-
-            // Form Submit handler
-            document.getElementById('presentationForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!currentUser) return;
-
-                const editId = document.getElementById('editSessionId').value;
-                const docId = editId || Date.now().toString();
-
-                const sessionData = {
-                    presenter: document.getElementById('formPresenter').value.trim(),
-                    topic: document.getElementById('formTopic').value.trim(),
-                    date: document.getElementById('formDate').value,
-                    status: document.getElementById('formStatus').value,
-                    deckUrl: document.getElementById('formDeckUrl').value.trim()
-                };
-
-                try {
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'presentations', docId), sessionData);
-                    showToast(editId ? "Presentation updated in cloud!" : "New presentation saved to cloud!");
-                    closePresentationModal();
-                } catch (err) {
-                    console.error("Error writing document:", err);
-                    showToast("Failed to save to cloud database.", false);
-                }
-            });
-
-            // Program Setup Modal handlers
-            const setupModal = document.getElementById('setupModal');
-            document.getElementById('setupProgramBtn').addEventListener('click', () => {
-                document.getElementById('setupStartDate').value = appConfig.startDate;
-                setupModal.classList.remove('hidden');
-            });
-
-            document.getElementById('closeSetupBtn').addEventListener('click', () => setupModal.classList.add('hidden'));
-            document.getElementById('cancelSetupBtn').addEventListener('click', () => setupModal.classList.add('hidden'));
-
-            document.getElementById('saveSetupBtn').addEventListener('click', async () => {
-                if (!currentUser) return;
-                const selectedDate = document.getElementById('setupStartDate').value;
-                if (selectedDate) {
-                    const snapped = getNextOrSameMonday(parseLocalDate(selectedDate));
-                    try {
-                        await setDoc(configDocRef, { startDate: snapped });
-                        setupModal.classList.add('hidden');
-                        showToast("Program start date updated globally!");
-                    } catch (err) {
-                        console.error("Error writing config:", err);
-                        showToast("Failed to update start date.", false);
-                    }
-                }
-            });
-
-            document.getElementById('coverSelectSession').addEventListener('change', (e) => {
-                renderSlidePreview(e.target.value);
-            });
-
-            document.getElementById('copySlideTextBtn').addEventListener('click', () => {
-                const textarea = document.getElementById('slideCopyText');
-                textarea.select();
-                document.execCommand('copy');
-                showToast("Slide text copied to clipboard!");
-            });
-
-            document.getElementById('downloadCoverHTMLBtn').addEventListener('click', downloadCoverHTML);
-        });
-    </script>
+    // Initialize application on load
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
 </body>
 </html>
